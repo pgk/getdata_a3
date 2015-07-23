@@ -1,4 +1,19 @@
 # R script run_analysis.R
+
+# require R version >= 3.1.x
+r.version <- R.Version()
+
+print(paste("using R version ", r.version$version.string))
+
+# require libraries
+if (require("plyr") == FALSE) { install.packages("plyr") }
+if (require("dplyr") == FALSE) { install.packages("dplyr") }
+if (require("reshape2") == FALSE) { install.packages("reshape2") }
+
+library(plyr)
+library(dplyr)
+library(reshape2)
+
 # download file if it does not exist and save it in ./data
 
 if (!dir.exists('data')) {
@@ -18,7 +33,7 @@ if (!file.exists(fname)) {
   print("done")
 }
 
-dataset_folder <- "./data/UCI HAR DAtaset"
+dataset_folder <- file.path("./data", "UCI HAR Dataset")
 
 if (!dir.exists(dataset_folder)) {
   print("extracting zipfile")
@@ -27,35 +42,26 @@ if (!dir.exists(dataset_folder)) {
 }
 
 
-if (require("plyr") == FALSE) { install.packages("plyr") }
-if (require("dplyr") == FALSE) { install.packages("dplyr") }
-if (require("reshape2") == FALSE) { install.packages("reshape2") }
-
-
-library(plyr)
-library(dplyr)
-
-
-training_set = paste(dataset_folder, "train", "X_train.txt", sep="/")
+training_set = file.path(dataset_folder, "train", "X_train.txt")
 print(training_set)
 
-training_labels = paste(dataset_folder, "train", "Y_train.txt", sep="/")
+training_labels = file.path(dataset_folder, "train", "y_train.txt")
 print(training_labels)
 
-test_set = paste(dataset_folder, "test", "X_test.txt", sep="/")
+test_set = file.path(dataset_folder, "test", "X_test.txt")
 print(test_set)
 
-test_labels = paste(dataset_folder, "test", "Y_test.txt", sep="/")
+test_labels = file.path(dataset_folder, "test", "y_test.txt")
 print(test_labels)
 
 
 
 # read feature labels and activity labels
 
-act_labels_file <- paste(dataset_folder, "activity_labels.txt", sep="/")
+act_labels_file <- file.path(dataset_folder, "activity_labels.txt")
 al_df <- read.table(act_labels_file)
 
-features_file <- paste(dataset_folder, "features.txt", sep="/")
+features_file <- file.path(dataset_folder, "features.txt")
 features_df <- read.table(features_file)
 
 
@@ -80,13 +86,17 @@ colnames(all_data) <- features_transposed
 d <- seq(1, nrow(all_data), by=1)
 all_data$id <- d
 
-library(reshape2)
-
 
 # Extracts only the measurements on the mean and standard deviation for each measurement.
 
 # melt columns
 melted_data <- melt(all_data, id=c("id"))
+
+# TODO split column variable into 3 columns
+
+split_cols <- within(melted_data, variable<-data.frame(do.call('rbind', strsplit(as.character(?melted_data$variable),'-',fixed=TRUE))))
+
+# TODO select only columns with means and stddevs
 
 
 # Uses descriptive activity names to name the activities in the data set
