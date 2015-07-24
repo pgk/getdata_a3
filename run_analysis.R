@@ -86,15 +86,20 @@ colnames(all_data) <- features_transposed
 d <- seq(1, nrow(all_data), by=1)
 all_data$id <- d
 
+means <- grep("-mean()", colnames(all_data))
+stds <- grep("-std()", colnames(all_data))
 
+all_column_indices = unlist(c(means, stds))
+
+all_data = all_data[all_column_indices]
 # Extracts only the measurements on the mean and standard deviation for each measurement.
 
 # melt columns
-melted_data <- melt(all_data, id=c("id"))
+# melted_data <- melt(all_data, id=c("id"))
 
 # TODO split column variable into 3 columns
 
-split_cols <- within(melted_data, variable<-data.frame(do.call('rbind', strsplit(as.character(?melted_data$variable),'-',fixed=TRUE))))
+# split_cols <- within(melted_data, variable<-data.frame(do.call('rbind', strsplit(as.character(?melted_data$variable),'-',fixed=TRUE))))
 
 # TODO select only columns with means and stddevs
 
