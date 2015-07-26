@@ -74,16 +74,12 @@ subject_test_df <- read.table(subject_test_set)
 
 tr_x_df <- read.table(training_set)
 tr_y_df <- read.table(training_labels)
-# tr_x_df$subject = subject_train_df
-# tr_x_df$activity <- as.vector(tr_y_df)
+
 
 te_x_df <- read.table(training_set)
 te_y_df <- read.table(training_labels)
-# te_x_df$subject = subject_test_df
-# te_x_df$activity = NA
-# te_x_df$activity <- as.vector(te_y_df)
-# rownames(te_x_df) <- seq(length(tr_x_df), length(tr_x_df) + length(te_x_df), by=1)
 
+# combine the y axes of training and test
 tr_all_y = rbind(tr_y_df, te_y_df)
 
 all_subjects = rbind(subject_train_df, subject_test_df)
