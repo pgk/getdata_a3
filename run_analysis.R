@@ -104,37 +104,25 @@ all_column_indices = unlist(c(means, stds))
 
 all_data = all_data[all_column_indices]
 
-# set activity numbers
 all_data$activity = as.vector(tr_all_y[1])
 all_data$activity = all_data$activity$V1
-# all_data$subject = NA
-# all_data$subject[,0:length(all_subjects)] = all_subjects
-# d <- seq(1, nrow(all_data), by=1)
-# all_data$id <- d
 
+# Remove data where subject is Not known
 cutoff <- 0:nrow(all_subjects)
-
 cut_data = all_data[cutoff,]
-
 cut_data$subject = all_subjects
-
-
-# melt columns
-# melted_data <- melt(all_data, id=c("id))
-
-# TODO split column variable into 3 columns
-
-# split_cols <- within(melted_data, variable<-data.frame(do.call('rbind', strsplit(as.character(melted_data$variable),'-',fixed=TRUE))))
-
-# str_split_fixed(melted_data$variable, "-", 2)
-
-# TODO select only columns with means and stddevs
-
-
 
 # Uses descriptive activity names to name the activities in the data set
 
 mm = merge(cut_data, al_df, by.x="activity", by.y="V1")
+mm["subject"] = mm$subject$V1
 
-# Appropriatelhy labels the data set with descriptive variable names. 
-# From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject
+ 
+# Create a second, independent tidy data set 
+# with the average of each variable for each activity and each subject
+
+melted_data <- melt(mm, id=c("activity", "subject", "V2"))
+final <- melted_data[complete.cases(melted_data),]
+dd <- ddply(final, c("activity", "subject", "V2", "variable"), function (df) mean(df$value))
+
+write.csv(dd, file = "final.txt")
